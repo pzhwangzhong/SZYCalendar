@@ -11,4 +11,7 @@
 @interface SZYCalendarModel : NSObject
 @property (nonatomic,strong) NSMutableArray *allModels;
 @property (nonatomic,strong) NSArray *allMonths;
+
+
+- (void)setDateWithFromDate:(NSDateComponents *)fromDate toDate:(NSDateComponents *)toDate;
 @end

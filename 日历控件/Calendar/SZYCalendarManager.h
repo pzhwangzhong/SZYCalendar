@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "SZYCalendarMonth.h"
 @interface SZYCalendarManager : NSObject
-
 + (instancetype)sharedInstance;
 
 /**

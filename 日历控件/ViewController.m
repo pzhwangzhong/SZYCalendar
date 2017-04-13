@@ -8,7 +8,7 @@
 
 #import "ViewController.h"
 #import "SZYCalendarView.h"
-@interface ViewController ()
+@interface ViewController ()<SZYCalendarViewDelegate>
 
 @end
 
@@ -16,17 +16,21 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.50
-    
-    SZYCalendarView *calendarView = [[SZYCalendarView alloc]initWithFrame:CGRectMake(0,50 , self.view.frame.size.width, 400)];
+    // 开始日期
+    NSDateComponents *fromComp = [[SZYCalendarManager sharedInstance] getComponentsWithYear:2015 month:1 day:1];
+    // 结束日期
+    NSDateComponents *toComp = [[SZYCalendarManager sharedInstance] getComponentsWithYear:2018 month:1 day:1];
+    SZYCalendarView *calendarView = [SZYCalendarView calenderViewWithFrame:CGRectMake(0,50 , self.view.frame.size.width, 400) fromDate:fromComp toDate:toComp];
+    calendarView.delegate = self;
     [self.view addSubview:calendarView];
+    
+    SZYCalendarDay * calendarDay = calendarView.selectDay;
+    NSLog(@"%ld年 %ld月 %ld日  星期%ld",calendarDay.year,calendarDay.month,calendarDay.day,calendarDay.weekday);
 }
 
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+#pragma mark - SZYCalendarViewDelegate
+- (void)calendarView:(SZYCalendarView *)calendar selectCalendarDay:(SZYCalendarDay *)calendarDay{
+    NSLog(@"%ld年 %ld月 %ld日  星期%ld",calendarDay.year,calendarDay.month,calendarDay.day,calendarDay.weekday);
 }
-
 
 @end

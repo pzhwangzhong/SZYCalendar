@@ -24,9 +24,9 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = 80;
-        CGFloat titleH = 40;
+        CGFloat width = frame.size.width;
+        CGFloat height = frame.size.height;
+        CGFloat titleH = height * 0.5;
         CGFloat weekH = height - titleH;
         
         // 添加按钮

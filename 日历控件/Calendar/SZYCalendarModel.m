@@ -22,14 +22,9 @@
     return _currentComp;
 }
 
-- (NSArray *)allMonths{
-    if (_allMonths==nil) {
-                NSDateComponents *fromComp = [self.calenderManager getComponentsWithYear:2015 month:1 day:1];
-                NSDateComponents *toComp = [self.calenderManager getComponentsWithYear:2018 month:1 day:1];
-        _allMonths = [self.calenderManager getMonthsForm:fromComp to:toComp isMonths:YES];
-        
-    }
-    return _allMonths;
+
+- (void)setDateWithFromDate:(NSDateComponents *)fromDate toDate:(NSDateComponents *)toDate{
+    _allMonths = [[SZYCalendarManager sharedInstance] getMonthsForm:fromDate to:toDate isMonths:YES];
 }
 
 - (SZYCalendarManager *)calenderManager{

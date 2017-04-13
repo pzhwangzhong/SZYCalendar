@@ -36,56 +36,76 @@ static NSString *const cellId = @"cellId";
 {
     self = [super initWithFrame:frame];
     if (self) {
-        
-        CGFloat width = [UIScreen mainScreen].bounds.size.width;
-        CGFloat height = 400;
-        CGFloat titleH = 80;
-        CGFloat contentH = height - titleH;
-        
-        _calendarTitle = [[SZYCalendarTitle alloc]initWithFrame:CGRectMake(0, 0, width, titleH)];
-        _calendarTitle.delegate = self;
-        [self addSubview:_calendarTitle];
-        _calendarTitle.backgroundColor = [UIColor redColor];
-        
-        // 布局
-        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
-        layout.minimumInteritemSpacing = 0;//列间距
-        layout.minimumLineSpacing = 0;//行间距
-        layout.itemSize = CGSizeMake(width, contentH);
-        layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;//水平滚动
-        
-        _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, titleH, width, contentH ) collectionViewLayout:layout];
-        _collectionView.delegate = self;
-        _collectionView.dataSource = self;
-        _collectionView.pagingEnabled = YES;
-        _collectionView.backgroundColor = [UIColor clearColor];
-        _collectionView.showsHorizontalScrollIndicator = NO;
-        [self addSubview:_collectionView];
-        
-        //注册
-        [_collectionView registerClass:[SZYCalendarCell class] forCellWithReuseIdentifier:cellId];
-        self.backgroundColor = [UIColor whiteColor];
-        
-        
-        // 设置当前月
-        NSDateComponents *comp = [[SZYCalendarManager sharedInstance] getCurrentComponents];
-        SZYCalendarMonth *currentMonth;
-        for (SZYCalendarMonth *month in self.viewModel.allMonths) {
-            if (month.year == comp.year && month.month == comp.month) {
-                currentMonth = month;
-            }
+    }
+    return self;
+}
+
++ (instancetype)calenderViewWithFrame:(CGRect)frame
+                             fromDate:(NSDateComponents *)fromDate
+                               toDate:(NSDateComponents *)toDate
+{
+    SZYCalendarView *calenView = [[self alloc]initWithFrame:frame];
+    [calenView.viewModel setDateWithFromDate:fromDate toDate:toDate];
+    [calenView setup];
+    return calenView;
+}
+
+// 初始化
+- (void)setup{
+    CGFloat width = [UIScreen mainScreen].bounds.size.width;
+    CGFloat height = width;
+    CGFloat titleH = height * 0.2;
+    CGFloat contentH = height - titleH;
+    
+    _calendarTitle = [[SZYCalendarTitle alloc]initWithFrame:CGRectMake(0, 0, width, titleH)];
+    _calendarTitle.delegate = self;
+    [self addSubview:_calendarTitle];
+    _calendarTitle.backgroundColor = [UIColor redColor];
+    
+    // 布局
+    UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc]init];
+    layout.minimumInteritemSpacing = 0;//列间距
+    layout.minimumLineSpacing = 0;//行间距
+    layout.itemSize = CGSizeMake(width, contentH);
+    layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;//水平滚动
+    
+    _collectionView = [[UICollectionView alloc]initWithFrame:CGRectMake(0, titleH, width, contentH ) collectionViewLayout:layout];
+    _collectionView.delegate = self;
+    _collectionView.dataSource = self;
+    _collectionView.pagingEnabled = YES;
+    _collectionView.backgroundColor = [UIColor clearColor];
+    _collectionView.showsHorizontalScrollIndicator = NO;
+    [self addSubview:_collectionView];
+    
+    //注册
+    [_collectionView registerClass:[SZYCalendarCell class] forCellWithReuseIdentifier:cellId];
+    self.backgroundColor = [UIColor whiteColor];
+    
+    
+    // 设置当前月
+    NSDateComponents *comp = [[SZYCalendarManager sharedInstance] getCurrentComponents];
+    SZYCalendarMonth *currentMonth;
+    SZYCalendarDay *currentDay;
+    for (SZYCalendarMonth *month in self.viewModel.allMonths) {
+        if (month.year == comp.year && month.month == comp.month) {
+            currentMonth = month;
         }
-        if (currentMonth) {
-            NSInteger index = [self.viewModel.allMonths indexOfObject:currentMonth];
-            self.currentIndex = index;
-            [self scrollToIndex:self.currentIndex];
-        }else{
-            currentMonth = self.viewModel.allMonths.firstObject;
-            self.currentIndex = 0;
+        for (SZYCalendarDay *day in month.calendarDays) {
+            if (day.year == comp.year && day.month == comp.month && day.day == comp.day) {
+                currentDay = day;
+            }
         }
         
     }
-    return self;
+    if (currentMonth) {
+        NSInteger index = [self.viewModel.allMonths indexOfObject:currentMonth];
+        self.currentIndex = index;
+        [self scrollToIndex:self.currentIndex];
+    }else{
+        currentMonth = self.viewModel.allMonths.firstObject;
+        self.currentIndex = 0;
+    }
+    self.selectDay = currentDay;
 }
 
 #pragma mark - 代理方法
@@ -133,6 +153,10 @@ static NSString *const cellId = @"cellId";
         }
     }
     [self.collectionView reloadData];
+    self.selectDay = cellModel.calendarDay;
+    if ([self.delegate respondsToSelector:@selector(calendarView:selectCalendarDay:)]) {
+        [self.delegate calendarView:self selectCalendarDay:cellModel.calendarDay];
+    }
 }
 #pragma mark - SZYCalendarTitleDelegate
 - (void)calendarTitle:(SZYCalendarTitle *)view clickType:(SZYCalendarClickType)clickType{
